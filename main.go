@@ -33,8 +33,8 @@ func (repo *Repository) CreateBook(c *fiber.Ctx) error {
 	}
 	fmt.Println("book after body parser update: ", book)
 	fmt.Println("-----------------")
-	dbErr := repo.DB.Create(&book).Error
-	if dbErr != nil {
+
+	if dbErr := repo.DB.Create(&book).Error; dbErr != nil {
 		return c.Status(500).SendString("could not create book")
 	}
 
@@ -45,9 +45,9 @@ func (repo *Repository) CreateBook(c *fiber.Ctx) error {
 
 func (repo *Repository) DeleteBook(c *fiber.Ctx) error {
 	id := c.Params("id")
-	var book models.Books
+	book := new(models.Books)
 	if id == "" {
-		return c.Status(http.StatusInternalServerError).JSON(&fiber.Map{
+		return c.Status(http.StatusBadRequest).JSON(&fiber.Map{
 			"message": "id is required",
 		})
 	}
@@ -63,7 +63,7 @@ func (repo *Repository) DeleteBook(c *fiber.Ctx) error {
 
 func (repo *Repository) GetBookByID(c *fiber.Ctx) error {
 	id := c.Params("id")
-	book := &models.Books{}
+	book := new(models.Books)
 
 	if id == "" {
 		return c.Status(http.StatusBadRequest).SendString("id is required")
